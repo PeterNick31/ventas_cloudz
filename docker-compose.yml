@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db_ventas:
+    image: postgres:16
+    container_name: db_ventas
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: db_ventas
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_ventas_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ventas-service:
+    build: .
+    container_name: ventas-service
+    restart: unless-stopped
+    depends_on:
+      db_ventas:
+        condition: service_healthy
+    environment:
+      DB_HOST: db_ventas
+      DB_PORT: 5432
+      DB_NAME: db_ventas
+      DB_USER: postgres
+      DB_PASSWORD: secret
+    ports:
+      - "8082:8082"
+
+volumes:
+  db_ventas_data:
