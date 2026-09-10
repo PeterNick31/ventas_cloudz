@@ -1,0 +1,4 @@
+/home/nicounixcat/proyecto-bodega/backend-ventas/src/main/java/com/bodega/ventas/model/Venta.java
+/home/nicounixcat/proyecto-bodega/backend-ventas/src/main/java/com/bodega/ventas/controller/VentasController.java
+/home/nicounixcat/proyecto-bodega/backend-ventas/src/main/java/com/bodega/ventas/repository/VentaRepository.java
+/home/nicounixcat/proyecto-bodega/backend-ventas/src/main/java/com/bodega/ventas/VentasApplication.java
