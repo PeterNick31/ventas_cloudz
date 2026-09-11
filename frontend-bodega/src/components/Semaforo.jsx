@@ -10,13 +10,11 @@ export default function Semaforo() {
       .catch((err) => console.error('Error al cargar ventas:', err));
   }, []);
 
-  const getBadges = (estado) => {
-    // Convertir a mayúsculas y limpiar espacios por seguridad
-    const est = String(estado).trim().toUpperCase();
-
-    if (est === 'ROJO') {
+  const getBadgesByCantidad = (cantidad) => {
+    // Umbrales adaptados al volumen de los 20,000 registros (rango aprox. 2200 - 2900)
+    if (cantidad < 2400) {
       return { color: '#ef4444', text: 'Baja Rotación (Alerta)' };
-    } else if (est === 'AMARILLO') {
+    } else if (cantidad >= 2400 && cantidad <= 2700) {
       return { color: '#eab308', text: 'Rotación Media' };
     } else {
       return { color: '#22c55e', text: 'Alta Rotación (Top Ventas)' };
@@ -31,7 +29,7 @@ export default function Semaforo() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
         {productos.map((prod) => {
-          const badge = getBadges(prod.estado);
+          const badge = getBadgesByCantidad(prod.cantidad);
           return (
             <div
               key={prod.productoId}
