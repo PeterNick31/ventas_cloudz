@@ -6,21 +6,21 @@ services:
     container_name: db_ventas
     restart: unless-stopped
     environment:
-      POSTGRES_DB: db_ventas
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - db_ventas_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   ventas-service:
-    build: .
+    build: ./backend-ventas
     container_name: ventas-service
     restart: unless-stopped
     depends_on:
@@ -29,9 +29,9 @@ services:
     environment:
       DB_HOST: db_ventas
       DB_PORT: 5432
-      DB_NAME: db_ventas
-      DB_USER: postgres
-      DB_PASSWORD: secret
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8082:8082"
 
