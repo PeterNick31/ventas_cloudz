@@ -49,4 +49,5 @@ public class VentasController {
     public List<Venta> obtenerHistorialPorProducto(@PathVariable Long productoId) {
         return ventaRepository.findByProductoId(productoId);
     }
+    
 }

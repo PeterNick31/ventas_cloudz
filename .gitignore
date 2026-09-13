@@ -18,3 +18,8 @@ Thumbs.db
 ### Variables de entorno / secretos ###
 .env
 *.env.local
+
+### Python ###
+venv/
+__pycache__/
+*.pyc
