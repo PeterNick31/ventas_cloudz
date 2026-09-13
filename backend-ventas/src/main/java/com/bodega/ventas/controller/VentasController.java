@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/ventas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "${APP_CORS_ORIGINS:http://localhost:5173}")
 public class VentasController {
 
     @Autowired
@@ -22,6 +22,11 @@ public class VentasController {
     // 1. Endpoint POST: Registrar venta diaria
     @PostMapping
     public Venta registrarVenta(@RequestBody Venta venta) {
+        if (venta.getProductoId() == null || venta.getCantidad() == null || venta.getCantidad() <= 0
+                || venta.getPrecioUnitario() == null || venta.getPrecioUnitario().signum() < 0) {
+            throw new IllegalArgumentException(
+                    "productoId, cantidad positiva y precioUnitario no negativo son obligatorios");
+        }
         if (venta.getFecha() == null) {
             venta.setFecha(LocalDateTime.now());
         }
@@ -49,5 +54,5 @@ public class VentasController {
     public List<Venta> obtenerHistorialPorProducto(@PathVariable Long productoId) {
         return ventaRepository.findByProductoId(productoId);
     }
-    
+
 }
