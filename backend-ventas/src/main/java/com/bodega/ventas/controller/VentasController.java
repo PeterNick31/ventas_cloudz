@@ -49,22 +49,5 @@ public class VentasController {
     public List<Venta> obtenerHistorialPorProducto(@PathVariable Long productoId) {
         return ventaRepository.findByProductoId(productoId);
     }
-        // 4. Endpoint PUT: Actualizar una venta existente
-    @PutMapping("/{id}")
-    public Venta actualizarVenta(@PathVariable Long id, @RequestBody Venta datos) {
-        Venta venta = ventaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Venta no encontrada con id: " + id));
-        venta.setCantidad(datos.getCantidad());
-        venta.setPrecioUnitario(datos.getPrecioUnitario());
-        return ventaRepository.save(venta);
-    }
 
-    // 5. Endpoint DELETE: Eliminar una venta
-    @DeleteMapping("/{id}")
-    public void eliminarVenta(@PathVariable Long id) {
-        if (!ventaRepository.existsById(id)) {
-            throw new RuntimeException("Venta no encontrada con id: " + id);
-        }
-        ventaRepository.deleteById(id);
-    }
 }
