@@ -1,0 +1,16 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd frontend-bodega && npm ci
+    build:
+      commands:
+        - cd frontend-bodega && npm run build
+  artifacts:
+    baseDirectory: frontend-bodega/dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - frontend-bodega/node_modules/**/*

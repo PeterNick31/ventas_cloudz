@@ -145,8 +145,14 @@ Documentados automáticamente en Swagger-UI: `http://localhost:8082/swagger-ui.h
 - **Documentación interactiva:** una vez levantado, disponible en
   `http://localhost:8082/swagger-ui.html`.
 
-### Estado del despliegue en AWS
-`solo local`
+### Frontend en AWS Amplify
+
+El archivo [`amplify.yml`](./amplify.yml) configura el build del frontend desde
+`frontend-bodega/`. En Amplify se debe crear la variable de entorno `VITE_API_URL` con la
+URL HTTPS pública del backend, por ejemplo `https://api.ejemplo.com`. El backend Spring Boot
+y PostgreSQL no se despliegan en Amplify Hosting: deben ejecutarse en un servicio separado
+(por ejemplo ECS/App Runner/Elastic Beanstalk y RDS), y configurar allí
+`APP_CORS_ORIGINS` con el dominio de Amplify.
 
 ---
 
@@ -164,9 +170,8 @@ Documentados automáticamente en Swagger-UI: `http://localhost:8082/swagger-ui.h
   ```
   Se sirve en `http://localhost:5173`.
 
-### Pendientes del frontend
-- [ ] La URL del backend está hardcodeada en `Semaforo.jsx` (`http://localhost:8082`) — hay
-  que moverla a una variable de entorno de Vite antes de desplegar en AWS Amplify.
+### Estado del frontend
+- [x] La URL del backend se configura mediante `VITE_API_URL` antes de desplegar en AWS Amplify.
 - [ ] Falta la vista de detalle por producto (stock vs. predicción vs. tiempo de entrega) que
   pide el enunciado — depende de que Inventario, Predicción y Proveedores ya tengan sus
   endpoints listos para consumir.

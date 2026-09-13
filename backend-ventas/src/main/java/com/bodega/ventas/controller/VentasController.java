@@ -4,6 +4,8 @@ import com.bodega.ventas.model.Venta;
 import com.bodega.ventas.repository.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class VentasController {
     public Venta registrarVenta(@RequestBody Venta venta) {
         if (venta.getProductoId() == null || venta.getCantidad() == null || venta.getCantidad() <= 0
                 || venta.getPrecioUnitario() == null || venta.getPrecioUnitario().signum() < 0) {
-            throw new IllegalArgumentException(
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "productoId, cantidad positiva y precioUnitario no negativo son obligatorios");
         }
         if (venta.getFecha() == null) {

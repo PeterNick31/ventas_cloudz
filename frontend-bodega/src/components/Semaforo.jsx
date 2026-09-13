@@ -1,72 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8082').replace(/\/$/, '');
 
 export default function Semaforo() {
   const [productos, setProductos] = useState([]);
+  const [estado, setEstado] = useState('cargando');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:8082/ventas')
-      .then((res) => res.json())
-      .then((data) => setProductos(data))
-      .catch((err) => console.error('Error al cargar ventas:', err));
+    const cargarVentas = async () => {
+      try {
+        setEstado('cargando');
+        const response = await fetch(`${API_URL}/ventas`);
+        if (!response.ok) throw new Error(`La API respondió con ${response.status}`);
+        const data = await response.json();
+        setProductos(Array.isArray(data) ? data : []);
+        setEstado('listo');
+      } catch (requestError) {
+        setError(requestError.message);
+        setEstado('error');
+      }
+    };
+
+    cargarVentas();
   }, []);
 
-  const getBadgesByCantidad = (cantidad) => {
-    // Umbrales adaptados al volumen de los 20,000 registros (rango aprox. 2200 - 2900)
-    if (cantidad < 2400) {
-      return { color: '#ef4444', text: 'Baja Rotación (Alerta)' };
-    } else if (cantidad >= 2400 && cantidad <= 2700) {
-      return { color: '#eab308', text: 'Rotación Media' };
-    } else {
-      return { color: '#22c55e', text: 'Alta Rotación (Top Ventas)' };
-    }
+  const getBadge = (estadoProducto) => {
+    const badges = {
+      ROJO: { color: '#dc2626', text: 'Baja rotación', className: 'badge-red' },
+      AMARILLO: { color: '#d97706', text: 'Rotación media', className: 'badge-yellow' },
+      VERDE: { color: '#15803d', text: 'Alta rotación', className: 'badge-green' },
+    };
+    return badges[estadoProducto] || { color: '#64748b', text: 'Sin clasificar', className: 'badge-neutral' };
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px' }}>
-        📊 Semáforo de Ventas - Rotación de Productos
-      </h1>
+    <section className="sales-dashboard">
+      <div className="dashboard-heading">
+        <div>
+          <p className="eyebrow">Operaciones / Ventas</p>
+          <h1>Rotación de productos</h1>
+          <p className="subtitle">Resumen acumulado para priorizar reposición.</p>
+        </div>
+        <span className="product-count">{productos.length} productos</span>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
+      {estado === 'cargando' && <p className="status-message">Cargando resumen de ventas...</p>}
+      {estado === 'error' && <p className="status-message error-message">No se pudo cargar el resumen: {error}</p>}
+      {estado === 'listo' && productos.length === 0 && (
+        <p className="status-message">Todavía no hay ventas registradas.</p>
+      )}
+
+      <div className="product-grid">
         {productos.map((prod) => {
-          const badge = getBadgesByCantidad(prod.cantidad);
+          const badge = getBadge(prod.estado);
           return (
-            <div
-              key={prod.productoId}
-              style={{
-                padding: '16px',
-                borderRadius: '12px',
-                border: '1px solid #e5e7eb',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}
-            >
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937', margin: '0 0 8px 0' }}>
-                Producto #{prod.productoId}
-              </h3>
-              
-              <p style={{ fontSize: '14px', color: '#6b7280', margin: '0 0 12px 0' }}>
-                Ventas Acumuladas: <strong style={{ color: '#111827' }}>{prod.cantidad}</strong>
-              </p>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    backgroundColor: badge.color,
-                    display: 'inline-block'
-                  }}
-                ></span>
-                <span style={{ fontSize: '12px', fontWeight: '500', color: '#4b5563' }}>
+            <article className="product-card" key={prod.productoId}>
+              <div className="card-topline">
+                <span className="product-label">Producto #{prod.productoId}</span>
+                <span className={`status-badge ${badge.className}`}>
+                  <span className="status-dot" style={{ backgroundColor: badge.color }} />
                   {badge.text}
                 </span>
               </div>
-            </div>
+              <strong className="sales-number">{Number(prod.cantidad).toLocaleString('es-CL')}</strong>
+              <span className="sales-label">unidades vendidas</span>
+            </article>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
